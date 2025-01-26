@@ -51,7 +51,19 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+// Define allowed origins
+const allowedOrigins = ['http://localhost:3000', 'https://your-deployed-frontend-url.com'];  // Add your frontend URLs here
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true); // Allow the request
+    } else {
+      callback(new Error('Not allowed by CORS')); // Reject the request
+    }
+  },
+}));
 
 app.use('/api/users', userRoutes);
 app.use('/api/tokens', tokenRoutes);
@@ -64,5 +76,6 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
     });
   })
   .catch((error) => console.error(error));
+
 
 
